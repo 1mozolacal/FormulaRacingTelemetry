@@ -5,6 +5,24 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 import datetime
 
+#Parse config file
+def readConfigFile():
+    configSettings = {}#return this dict
+    configFile = open("config.txt", "r")
+    namesLine = configFile.readline().split(";")  # gets array
+    dataNames = {}  # Kinda of like an enum for the different values
+    for i in range(0, len(namesLine), 2):
+        dataNames[int(namesLine[i + 1])] = namesLine[i]#the number is the key string is the value
+    dataFocus = configFile.readline()
+    dataFocusNum = int(dataFocus[6:len(dataFocus)])#removes the "graph=" part
+    configSettings["dataNum"] = dataFocusNum
+    configSettings["dataName"] = dataNames[dataFocusNum]
+    return configSettings
+
+systemVar = readConfigFile()
+
+
+
 now = datetime.datetime.now()
 timeLable = now.strftime("%F %T")
 timeLable = timeLable.replace(":",".")

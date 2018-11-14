@@ -1,0 +1,2 @@
+oilPress;1;coolantPress;2
+graph=2
