@@ -5,6 +5,9 @@ import time
 import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 import datetime
+import numpy as np
+from matplotlib.collections import LineCollection
+from matplotlib.colors import ListedColormap, BoundaryNorm
 
 #Parse config file
 def readConfigFile():
@@ -40,7 +43,10 @@ def readConfigFile():
 
 systemVar = readConfigFile()#a dict of user inputed varibles
 
-
+cmap = ListedColormap(['b','r'])
+boundMax = 100;
+boundWarning = 50;
+norm = BoundaryNorm([0,0,boundWarning,boundMax], cmap.N)
 
 now = datetime.datetime.now()#gets current time
 timeLable = now.strftime("%F %T")#converts time to string
@@ -53,27 +59,44 @@ axl = fig.add_subplot(1,1,1)
 
 #arrays for inputing data from sensor
 xData, yData = [],[]#array to be filled by the reading tread
-
+colour = []
 #update function is called by the animate function for the graph
 def update(i):
+    if(not len(xData)>1):#there need to be aleast two data points inorder to make a line
+        return;
+
+    points = np.array([xData, yData]).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+    lc = LineCollection(segments, cmap=cmap, norm=norm)
+    spilter = np.asarray(yData)
+    lc.set_array(spilter)
+    plt.gca().add_collection(lc)
+    plt.xlim(0, xData[-1])
+    plt.ylim(0, 100)
+    '''
     axl.clear()#clears old graphed stuff
-    axl.plot(xData, yData)#plot new data
+    axl.scatter(xData, yData, c=colour)#plot new data
     last = xData[len(xData)-1]#get the last time
     if (last> 2000):#if you should start scrolling
         a, b, c, d = plt.axis()#get axis
         plt.axis([last - 2000, last, c, d])#keep y axis the same but shifts the x axis
-
+    '''
 
 #a tread to constantly read the serial data
-def Task1(ser,x,y):
+def Task1(ser,x,y,col):
 
     while 1:#while loop to allows read the serial input
         b = ser.readline().decode("utf-8")#readline(make sure that there is infact a \n char otherwise this won't end)
         parts = b.split(',')#splits by a ','
         #print(b)
         try:#trys to parse data(sometimes at the begining there isn't a full line
+            val = float(parts[1])
             x.append(int(parts[0]))#time
-            y.append(float(parts[1]))#value
+            y.append(val)#value
+            if(val>60):
+                col.append(1)
+            else:
+                col.append(-1)
             file.write(b)#I am not including \n because b has a new line character
         except:
             print("ERROR on data convert: either missing data or not int/float data")
@@ -85,7 +108,7 @@ def Main():
     time.sleep(1)
     ser.flushInput()#Ensure the stored input is emptyed(will sometime contain infomation from last run)
     time.sleep(1)
-    t1 = threading.Thread(target = Task1, args=[ser,xData,yData])#make the serial reading thread
+    t1 = threading.Thread(target = Task1, args=[ser,xData,yData,colour])#make the serial reading thread
     #print ("Starting Thread 1")
     t1.start()#start the serial reading tread
     an = ani.FuncAnimation(fig, update, interval=200)#sets up the animate function for the graph
