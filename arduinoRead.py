@@ -21,7 +21,7 @@ def readConfigFile():
     comPortRAW = configFile.readline()
     comPortEqualLoc = comPortRAW.find("=")#gets the locaiton of the equal sign
     if(comPortEqualLoc == -1 or comPortEqualLoc >= len(comPortRAW)-2):#2 instead of a 1 because of the new line character
-        print("Error in the com port setting")
+        print("Error in the 'port' setting")
         print("closing in 10 sec")
         time.sleep(10)#So they can see the print
         exit()
@@ -29,31 +29,101 @@ def readConfigFile():
     configSettings["comPort"] = comPort
     #endregion
 
-
+    #region data id
     namesLineArray = configFile.readline().split(";")  # gets array
     namesLineDict = {}  # Kinda of like an enum for the different values
     for i in range(0, len(namesLineArray), 2):
         namesLineDict[int(namesLineArray[i + 1])] = namesLineArray[i]  # the number is the key string is the value
+    #endregion
 
-    dataSelected = configFile.readline()
-    dataSelected = dataSelected[6:len(dataSelected)]#removes the "graph=" part
+    #region data selected
+    dataSelectedRAW = configFile.readline()
+    dataSelectedEqualLoc = dataSelectedRAW.find("=")  # gets the locaiton of the equal sign
+    if (dataSelectedEqualLoc == -1 or dataSelectedEqualLoc >= len(dataSelectedRAW) - 2):  # 2 instead of a 1 because of the new line character
+        print("Error in the 'graph' setting")
+        print("closing in 10 sec")
+        time.sleep(10)  # So they can see the print
+        exit()
+    dataSelected = dataSelectedRAW[int(dataSelectedEqualLoc + 1):int(len(dataSelectedRAW) - 1)]
     dataSelectedArray = dataSelected.replace(" ","").split(',')
     for i in range(0,len(dataSelectedArray)):#converts the array of strings to integers
         dataSelectedArray[i] = int(dataSelectedArray[i])
+    #endregion
 
+    #region set up 2D array for the feature of each dataset
     #the number of different things that can customize a dataset(in the future there will be ranges and so on)
-    differentDataFeatures = 2
+    differentDataFeatures = 4
+    differentDataFeaturesArray = ["id","name","colourLow","colourHigh"]
+    differentDataFeaturesArrayDefault = ["id","name","#0000ff","#ff0000"]
     #0 = (int) the number
     #1 = (String) the name
+    #2 = (String) colourLow
+    #3 = (String) colourHigh
     dataConfigArray =  [[None for x in range(differentDataFeatures)] for y in range(len(dataSelectedArray))] # when calling[Which type of data][the feature]
     # note make a default one to replace if a None value is found
 
     for i in range(0,len(dataSelectedArray)):
         dataConfigArray[i][0] = dataSelectedArray[i]#the number
         dataConfigArray[i][1] = namesLineDict[dataSelectedArray[i]]#the name
+    #endregion
 
 
+    tempDic = {}
+    temp = configFile.readline()
+    if(not len(temp.rstrip("\n")) == 0):
+        tempDic["id"] = int(temp.rstrip("\n"))
+        atEnd = False
+        while( not atEnd):
+            newLine = configFile.readline()
+            if(len(newLine) == 0 or newLine.rstrip("\n") == "--end--" ):
+                atEnd = True
+            print(len(newLine) <=3)
+            if(len(newLine) <=3 or atEnd):#new number(up to 99)
+                #save recored values
+                indexOfDataset = -1
+                for i in range(len(dataSelectedArray)):
+                    if(dataSelectedArray[i] == tempDic["id"]):
+                        indexOfDataset=i
+                if(indexOfDataset==-1):
+                    print("Setting varibles for a dataset that is not selected")
+                    print("closing in 10 sec")
+                    time.sleep(10)  # So they can see the print
+                    exit()
+                for i in range(2,differentDataFeatures):
+                    if(i in tempDic):
+                        dataConfigArray[indexOfDataset][i] = tempDic[i]
+                    else:
+                        dataConfigArray[indexOfDataset][i] = differentDataFeaturesArrayDefault[i]
+                print(tempDic)
+                if(atEnd):
+                    break;
+                #Reset the temp dic
+                tempDic = {}
+                tempDic["id"] = int(newLine.rstrip("\n"))
+            else:
+                #region add 'newline' to tempDic
+                newLineEqualLoc = newLine.find("=")
+                if(newLineEqualLoc ==-1  or newLine.rstrip("\n")[-1] == "="):
+                    print("error in a graph setting(no equals sign or no value):" + str(newLine))
+                    print("closing in 10 sec")
+                    time.sleep(10)  # So they can see the print
+                    exit()
+                nameOfSetting = newLine[0:newLineEqualLoc]
+                indexOfSetting = -1
+                for i in range(2,len(differentDataFeaturesArray)):
+                    if(differentDataFeaturesArray[i] == nameOfSetting):
+                        indexOfSetting= i
+                print(nameOfSetting)
+                if(indexOfSetting == -1):
+                    print("error in a graph setting(name of feature not found)")
+                    print("closing in 10 sec")
+                    time.sleep(10)  # So they can see the print
+                    exit()
+                valueOfSetting = newLine[newLineEqualLoc+1:len(newLine)].rstrip("\n")
+                tempDic[indexOfSetting] = valueOfSetting
+            #endregion
 
+    print(dataConfigArray)
     configSettings["dataConfig"] = dataConfigArray
 
     return configSettings#returns the varible inputed by a
@@ -108,7 +178,7 @@ def Task1(ser,x,y,col):
         #print(b)
         try:#trys to parse data(sometimes at the begining there isn't a full line
             val = float(parts[1])
-            x.append(int(parts[0]))#time
+            x.append(int(parts[0])/1000.0)#time
             y.append(val)#value
             if(val>60):
                 col.append(1)

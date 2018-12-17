@@ -1,3 +1,9 @@
 port=COM3
 oilPress;1;coolantPress;2;voltage;3
-graph=2,3
+graph=2,3,1
+2
+colourLow=34
+colourHigh=5
+3
+colourLow=adgsdfadfsadf
+1
