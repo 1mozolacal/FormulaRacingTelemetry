@@ -1,2 +1,3 @@
+port=COM3
 oilPress;1;coolantPress;2;voltage;3
 graph=2,3

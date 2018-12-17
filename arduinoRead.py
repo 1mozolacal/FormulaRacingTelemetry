@@ -9,10 +9,27 @@ import numpy as np
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm
 
+print("Program Starting...")
+
+
 #Parse config file
 def readConfigFile():
     configSettings = {}#return this dict
     configFile = open("config.txt", "r")#opens config file
+
+    #region Communication port settings
+    comPortRAW = configFile.readline()
+    comPortEqualLoc = comPortRAW.find("=")#gets the locaiton of the equal sign
+    if(comPortEqualLoc == -1 or comPortEqualLoc >= len(comPortRAW)-2):#2 instead of a 1 because of the new line character
+        print("Error in the com port setting")
+        print("closing in 10 sec")
+        time.sleep(10)#So they can see the print
+        exit()
+    comPort = comPortRAW[int(comPortEqualLoc+1):int(len(comPortRAW)-1)]#takes all the character after the equals sign(-1 to get rid of the newline character)
+    configSettings["comPort"] = comPort
+    #endregion
+
+
     namesLineArray = configFile.readline().split(";")  # gets array
     namesLineDict = {}  # Kinda of like an enum for the different values
     for i in range(0, len(namesLineArray), 2):
@@ -43,7 +60,7 @@ def readConfigFile():
 
 systemVar = readConfigFile()#a dict of user inputed varibles
 
-cmap = ListedColormap(['b','r'])
+cmap = ListedColormap(['#affc67','r'])
 boundMax = 100;
 boundWarning = 50;
 norm = BoundaryNorm([0,0,boundWarning,boundMax], cmap.N)
@@ -104,7 +121,7 @@ def Task1(ser,x,y,col):
 
 
 def Main():
-    ser = serial.Serial('COM3')#open and Arduino serial
+    ser = serial.Serial(systemVar["comPort"])#open and Arduino serial
     time.sleep(1)
     ser.flushInput()#Ensure the stored input is emptyed(will sometime contain infomation from last run)
     time.sleep(1)
