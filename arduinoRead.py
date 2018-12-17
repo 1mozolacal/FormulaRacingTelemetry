@@ -67,53 +67,52 @@ def readConfigFile():
         dataConfigArray[i][1] = namesLineDict[dataSelectedArray[i]]#the name
     #endregion
 
-
-    tempDic = {}
+    #region read feature for each dataset
+    tempDic = {}#empty dic for a the feature of a dataset(gets reset for other datasets)
     temp = configFile.readline()
-    if(not len(temp.rstrip("\n")) == 0):
+    if(not len(temp.rstrip("\n")) == 0):#if the next line is a number
         tempDic["id"] = int(temp.rstrip("\n"))
         atEnd = False
-        while( not atEnd):
+        while( not atEnd):#continually reads down the file
             newLine = configFile.readline()
-            if(len(newLine) == 0 or newLine.rstrip("\n") == "--end--" ):
+            if(len(newLine) == 0 or newLine.rstrip("\n") == "--end--" ):#check if it is the end
                 atEnd = True
-            print(len(newLine) <=3)
             if(len(newLine) <=3 or atEnd):#new number(up to 99)
+                #region save values to "dataConfigArray"
                 #save recored values
                 indexOfDataset = -1
-                for i in range(len(dataSelectedArray)):
+                for i in range(len(dataSelectedArray)):#finds the number which the dataset pertains to
                     if(dataSelectedArray[i] == tempDic["id"]):
                         indexOfDataset=i
-                if(indexOfDataset==-1):
+                if(indexOfDataset==-1):#check if it was not found
                     print("Setting varibles for a dataset that is not selected")
                     print("closing in 10 sec")
                     time.sleep(10)  # So they can see the print
                     exit()
-                for i in range(2,differentDataFeatures):
-                    if(i in tempDic):
+                for i in range(2,differentDataFeatures):#loops throught all the feature for the dataset
+                    if(i in tempDic):#if exits
                         dataConfigArray[indexOfDataset][i] = tempDic[i]
-                    else:
+                    else:#if it does not then use a default
                         dataConfigArray[indexOfDataset][i] = differentDataFeaturesArrayDefault[i]
-                print(tempDic)
-                if(atEnd):
+                if(atEnd):#if it ran this when at the bottom of the file(inorder to updata the very last one) then exit the while loop
                     break;
                 #Reset the temp dic
                 tempDic = {}
                 tempDic["id"] = int(newLine.rstrip("\n"))
+                #endregion
             else:
                 #region add 'newline' to tempDic
                 newLineEqualLoc = newLine.find("=")
-                if(newLineEqualLoc ==-1  or newLine.rstrip("\n")[-1] == "="):
+                if(newLineEqualLoc ==-1  or newLine.rstrip("\n")[-1] == "="):#if there is no equal sign or it is the last thing
                     print("error in a graph setting(no equals sign or no value):" + str(newLine))
                     print("closing in 10 sec")
                     time.sleep(10)  # So they can see the print
                     exit()
-                nameOfSetting = newLine[0:newLineEqualLoc]
+                nameOfSetting = newLine[0:newLineEqualLoc]#name is the part upto the equal sign
                 indexOfSetting = -1
-                for i in range(2,len(differentDataFeaturesArray)):
+                for i in range(2,len(differentDataFeaturesArray)):#find the index number of the feature
                     if(differentDataFeaturesArray[i] == nameOfSetting):
                         indexOfSetting= i
-                print(nameOfSetting)
                 if(indexOfSetting == -1):
                     print("error in a graph setting(name of feature not found)")
                     print("closing in 10 sec")
@@ -121,11 +120,13 @@ def readConfigFile():
                     exit()
                 valueOfSetting = newLine[newLineEqualLoc+1:len(newLine)].rstrip("\n")
                 tempDic[indexOfSetting] = valueOfSetting
-            #endregion
+                #endregion
+    #endregion
 
-    print(dataConfigArray)
     configSettings["dataConfig"] = dataConfigArray
 
+    print("Configuration set up as")
+    print(configSettings)
     return configSettings#returns the varible inputed by a
 
 systemVar = readConfigFile()#a dict of user inputed varibles
