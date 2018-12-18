@@ -11,6 +11,15 @@ from matplotlib.colors import ListedColormap, BoundaryNorm
 
 print("Program Starting...")
 
+#loops through every line in config.txt until it reaches Port=COMx to store into a dict
+def user_input_simplification(number,dict,configFile):
+    configFile = open("config.txt","r")
+    for i in range(number):
+        line_reading = configFile.readline()
+        comport = line_reading.strip().split('=')
+        print(comport[0])
+        comportdict[comport[0]] = comport[1]
+        print(comportdict)
 
 #Parse config file
 def readConfigFile():
