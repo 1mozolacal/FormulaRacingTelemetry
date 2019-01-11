@@ -10,7 +10,7 @@ import datetime
 import numpy as np
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm
-from tkinter import * 
+from Tkinter import * 
 
 root = Tk()
 
@@ -22,6 +22,12 @@ def task():
 
 print("Program Starting...")
 
+def error():
+    count = 0
+    if (count == 0):
+        if (oil[-1] > 90 and ((oil[-2]) <= 90.0)):
+            root.after(((oil[-1]) > 90.0) and ((oil[-2]) <= 90.0),task)
+            count = count +1
 
 #Parse config file
 def readConfigFile():
@@ -181,6 +187,7 @@ def update(i):
         plt.axis([last - 2000, last, c, d])#keep y axis the same but shifts the x axis
     '''
 
+oil = []
 
 #a tread to constantly read the serial data
 def Task1(ser,x,y,col):
@@ -188,10 +195,8 @@ def Task1(ser,x,y,col):
         while 1:#while loop to allows read the serial input
             b = ser.readline().decode("utf-8")#readline(make sure that there is infact a \n char otherwise this won't end)
             parts = b.split(',')#splits by a ','
-            #print(b)
-            if (float(parts[1])) > 90:
-                print(parts[1])
-                #root.after((float(parts[1])) > 90,task)
+            oil.append(float(parts[1]))
+            error()
             try:#trys to parse data(sometimes at the begining there isn't a full line
                 val = float(parts[1])
                 x.append(int(parts[0])/1000.0)#time
