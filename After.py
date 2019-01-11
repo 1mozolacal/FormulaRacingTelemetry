@@ -16,7 +16,7 @@ root = Tk()
 
 def task():
     root = Tk()
-    w = Label(root, text="Warning")
+    w = Label(root, text="Warning Oil Pressure Above 90")
     w.pack()
     #root.after((float(parts[1])) > 90, task)  # reschedule event in 2 seconds
 
