@@ -1,9 +1,10 @@
-port=COM3
+port=COM5
 oilPress;1;coolantPress;2;voltage;3
 graph=2,3,1
 2
 colourLow=34
-colourHigh=5
+colourHigh=51:33 AM 2019-01-11
 3
 colourLow=adgsdfadfsadf
 1
+division = 2

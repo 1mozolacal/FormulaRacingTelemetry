@@ -21,6 +21,16 @@ def user_input_simplification(number,dict,configFile):
         comportdict[comport[0]] = comport[1]
         print(comportdict)
 
+#to control the subplots position
+def subplotdivision():
+    configFile = open("config.txt","r")
+    for i, line in enumerate(configFile):
+        if i == 9:#is 10th line 
+            readit = configFile.readline()
+            divide = readit.strip().split('=')
+            divdict[divide[0]] = divide[1]
+            print(divdict)
+
 #Parse config file
 def readConfigFile():
     configSettings = {}#return this dict
@@ -152,7 +162,8 @@ file = open("SavedData/Data-" + timeLable+".txt", "a")#make a file for writing s
 
 #set up pyplot varible
 fig = plt.figure()
-axl = fig.add_subplot(1,1,1)
+axl = fig.add_subplot(2,1,1)
+axl = fig.add_subplot(2,1,2)
 
 #arrays for inputing data from sensor
 xData, yData = [],[]#array to be filled by the reading tread
@@ -185,7 +196,7 @@ def Task1(ser,x,y,col):
     while 1:#while loop to allows read the serial input
         b = ser.readline().decode("utf-8")#readline(make sure that there is infact a \n char otherwise this won't end)
         parts = b.split(',')#splits by a ','
-        #print(b)
+        #print(parts)
         try:#trys to parse data(sometimes at the begining there isn't a full line
             val = float(parts[1])
             x.append(int(parts[0])/1000.0)#time
