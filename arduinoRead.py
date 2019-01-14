@@ -61,7 +61,7 @@ def readConfigFile():
     #the number of different things that can customize a dataset(in the future there will be ranges and so on)
     differentDataFeatures = 4
     differentDataFeaturesArray = ["id","name","colourLow","colourHigh"]
-    differentDataFeaturesArrayDefault = ["id","name","#0000ff","#ff0000"]
+    differentDataFeaturesArrayDefault = ["id","name","#099614","#ff0000"]
     #0 = (int) the number
     #1 = (String) the name
     #2 = (String) colourLow
@@ -138,9 +138,11 @@ def readConfigFile():
 
 systemVar = readConfigFile()#a dict of user inputed varibles
 
-cmap = ListedColormap(['#affc67','r'])
-boundMax = 100;
-boundWarning = 50;
+firstDataSet = systemVar['dataConfig'][0];
+
+cmap = ListedColormap([firstDataSet[2],firstDataSet[3]])#the colour of the
+boundMax = 55;#Has to be larger to equal to the threshhold(boundWarning)
+boundWarning = 55;#this is the value of the threshold of where green turns to red
 norm = BoundaryNorm([0,0,boundWarning,boundMax], cmap.N)
 
 now = datetime.datetime.now()#gets current time
