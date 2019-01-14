@@ -185,11 +185,14 @@ def update(i):
     axl.scatter(xData, yData, c=colour)#plot new data
     '''
     last = xData[len(xData)-1]#get the last time
-    print(last);
     timeWindow = 2;
     if (last> timeWindow):#if you should start scrolling
         a, b, c, d = plt.axis()#get axis
         plt.axis([last - timeWindow, last, c, d])#keep y axis the same but shifts the x axis
+    for i in range( len(xData)-1, -1, -1):
+        if(last - xData[i] > timeWindow):
+            xData.pop(i)
+            yData.pop(i);
 
 
 oil = []
