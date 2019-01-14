@@ -1,6 +1,6 @@
-port=COM7
+port=COM5
 oilPress;1;coolant;2;voltage;3
-graph=2,3,1
+graph=2,1,3
 2
 colourLow=34
 colourHigh=5

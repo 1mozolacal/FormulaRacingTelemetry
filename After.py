@@ -148,6 +148,8 @@ def readConfigFile():
 
 systemVar = readConfigFile()#a dict of user inputed varibles
 
+print(systemVar)
+
 firstDataSet = systemVar['dataConfig'][0];
 
 cmap = ListedColormap([firstDataSet[2],firstDataSet[3]])
@@ -231,7 +233,7 @@ def Main():
 
     plt.title('Telemetry Software')
     plt.xlabel('Time')
-    plt.ylabel('Coolant')
+    plt.ylabel(systemVar['dataConfig'][0][1])
     plt.grid()#makes a grid
     plt.show()#make the graph visable
     
