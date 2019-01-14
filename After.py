@@ -2,15 +2,15 @@
 import threading
 import time
 import serial
-matplotlib.use("TkAgg")
 import matplotlib
+matplotlib.use("tkAgg")
 import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 import datetime
 import numpy as np
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm
-from Tkinter import * 
+from tkinter import *
 
 root = Tk()
 
@@ -55,23 +55,23 @@ def readConfigFile():
 
     #region data selected
     dataSelectedRAW = configFile.readline()
-    if (dataSelectedEqualLoc == -1 or dataSelectedEqualLoc >= len(dataSelectedRAW) - 2):  # 2 instead of a 1 because of the new line character
     dataSelectedEqualLoc = dataSelectedRAW.find("=")  # gets the locaiton of the equal sign
+    if (dataSelectedEqualLoc == -1 or dataSelectedEqualLoc >= len(dataSelectedRAW) - 2):  # 2 instead of a 1 because of the new line character
         print("Error in the 'graph' setting")
         print("closing in 10 sec")
         time.sleep(10)  # So they can see the print
         exit()
-    dataSelectedArray = dataSelected.replace(" ","").split(',')
     dataSelected = dataSelectedRAW[int(dataSelectedEqualLoc + 1):int(len(dataSelectedRAW) - 1)]
+    dataSelectedArray = dataSelected.replace(" ","").split(',')
     for i in range(0,len(dataSelectedArray)):#converts the array of strings to integers
         dataSelectedArray[i] = int(dataSelectedArray[i])
     #endregion
 
     #region set up 2D array for the feature of each dataset
     #the number of different things that can customize a dataset(in the future there will be ranges and so on)
-    differentDataFeatures = 4
-    differentDataFeaturesArray = ["id","name","colourLow","colourHigh"]
-    differentDataFeaturesArrayDefault = ["id","name","#0000ff","#ff0000"]
+    differentDataFeatures = 5
+    differentDataFeaturesArray = ["id","name","colourLow","colourHigh","threshold"]
+    differentDataFeaturesArrayDefault = ["id","name","#0000ff","#ff0000", "70"]
     #0 = (int) the number
     #1 = (String) the name
     #2 = (String) colourLow
@@ -148,9 +148,11 @@ def readConfigFile():
 
 systemVar = readConfigFile()#a dict of user inputed varibles
 
-cmap = ListedColormap(['#affc67','r'])
-boundMax = 100;
-boundWarning = 50;
+firstDataSet = systemVar['dataConfig'][0];
+
+cmap = ListedColormap([firstDataSet[2],firstDataSet[3]])
+boundMax = int(firstDataSet[4]);
+boundWarning = int(firstDataSet[4]);
 norm = BoundaryNorm([0,0,boundWarning,boundMax], cmap.N)
 
 now = datetime.datetime.now()#gets current time
@@ -181,11 +183,14 @@ def update(i):
     '''
     axl.clear()#clears old graphed stuff
     axl.scatter(xData, yData, c=colour)#plot new data
-    last = xData[len(xData)-1]#get the last time
-    if (last> 2000):#if you should start scrolling
-        a, b, c, d = plt.axis()#get axis
-        plt.axis([last - 2000, last, c, d])#keep y axis the same but shifts the x axis
     '''
+    last = xData[len(xData)-1]#get the last time
+    print(last);
+    timeWindow = 2;
+    if (last> timeWindow):#if you should start scrolling
+        a, b, c, d = plt.axis()#get axis
+        plt.axis([last - timeWindow, last, c, d])#keep y axis the same but shifts the x axis
+
 
 oil = []
 
