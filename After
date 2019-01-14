@@ -1,9 +1,9 @@
 #imports
 import threading
-import time
 import serial
-matplotlib.use("TkAgg")
+import time
 import matplotlib
+matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 import datetime
@@ -16,18 +16,12 @@ root = Tk()
 
 def task():
     root = Tk()
-    w = Label(root, text="Warning Oil Pressure Above 90")
+    w = Label(root, text="Warning")
     w.pack()
     #root.after((float(parts[1])) > 90, task)  # reschedule event in 2 seconds
 
 print("Program Starting...")
 
-def error():
-    count = 0
-    if (count == 0):
-        if (oil[-1] > 90 and ((oil[-2]) <= 90.0)):
-            root.after(((oil[-1]) > 90.0) and ((oil[-2]) <= 90.0),task)
-            count = count +1
 
 #Parse config file
 def readConfigFile():
@@ -55,14 +49,14 @@ def readConfigFile():
 
     #region data selected
     dataSelectedRAW = configFile.readline()
-    if (dataSelectedEqualLoc == -1 or dataSelectedEqualLoc >= len(dataSelectedRAW) - 2):  # 2 instead of a 1 because of the new line character
     dataSelectedEqualLoc = dataSelectedRAW.find("=")  # gets the locaiton of the equal sign
+    if (dataSelectedEqualLoc == -1 or dataSelectedEqualLoc >= len(dataSelectedRAW) - 2):  # 2 instead of a 1 because of the new line character
         print("Error in the 'graph' setting")
         print("closing in 10 sec")
         time.sleep(10)  # So they can see the print
         exit()
-    dataSelectedArray = dataSelected.replace(" ","").split(',')
     dataSelected = dataSelectedRAW[int(dataSelectedEqualLoc + 1):int(len(dataSelectedRAW) - 1)]
+    dataSelectedArray = dataSelected.replace(" ","").split(',')
     for i in range(0,len(dataSelectedArray)):#converts the array of strings to integers
         dataSelectedArray[i] = int(dataSelectedArray[i])
     #endregion
@@ -187,7 +181,6 @@ def update(i):
         plt.axis([last - 2000, last, c, d])#keep y axis the same but shifts the x axis
     '''
 
-oil = []
 
 #a tread to constantly read the serial data
 def Task1(ser,x,y,col):
@@ -195,8 +188,10 @@ def Task1(ser,x,y,col):
         while 1:#while loop to allows read the serial input
             b = ser.readline().decode("utf-8")#readline(make sure that there is infact a \n char otherwise this won't end)
             parts = b.split(',')#splits by a ','
-            oil.append(float(parts[1]))
-            error()
+            #print(b)
+            if (float(parts[1])) > 90:
+                print(parts[1])
+                root.after((float(parts[1])) > 90,task)
             try:#trys to parse data(sometimes at the begining there isn't a full line
                 val = float(parts[1])
                 x.append(int(parts[0])/1000.0)#time
@@ -221,12 +216,7 @@ def Main():
     t1.start()#start the serial reading tread
     an = ani.FuncAnimation(fig, update, interval=200)#sets up the animate function for the graph
 
-    plt.title('Telemetry Software')
-    plt.xlabel('Time')
-    plt.ylabel('Coolant')
-    plt.grid()#makes a grid
     plt.show()#make the graph visable
-    
     #print( "=== exiting ===")
 
 
