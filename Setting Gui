@@ -17,17 +17,23 @@ graph.grid(row=3, column=0)
 egraph= Entry(master)
 egraph.grid(row=4, column=0)
 
+threshold= Label(master, text="Enter a number for threshold")
+threshold.grid(row=5, column=0)
+
+ethreshold= Entry(master)
+ethreshold.grid(row=6, column=0)
+
 tgraph= Label(master, text="Enter a number for top colour")
-tgraph.grid(row=5, column=0)
+tgraph.grid(row=7, column=0)
 
 etgraph= Entry(master)
-etgraph.grid(row=6, column=0)
+etgraph.grid(row=8, column=0)
 
 bgraph= Label(master, text="Enter a number for bottom colour")
-bgraph.grid(row=7, column=0)
+bgraph.grid(row=9, column=0)
 
 ebgraph= Entry(master)
-ebgraph.grid(row=8, column=0)
+ebgraph.grid(row=10, column=0)
 
 def write():
     #print e.get()
@@ -35,14 +41,14 @@ def write():
     File.write("\noilPress;1;coolant;2;voltage;3")
     File.write("\ngraph=2,1,3\n")
     File.write(egraph.get())
-    File.write("\ncolourLow=34\ncolourHigh=5\n")
+    File.write("\ncolourLow=#bff442\ncolourHigh=#c44f15\n")
+    File.write("threshold="+ethreshold.get()+"\n")
     File.write(etgraph.get())
     File.write("\ncolourLow=adgsdfadfsadf\n")
     File.write(ebgraph.get())
 
-Button(master, text="Enter", width=10, command=write).grid(row=9, column=0)
+Button(master, text="Enter", width=10, command=write).grid(row=11, column=0)
 
-Button(master, text='Quit', command=master.quit).grid(row=9, column=4)
+Button(master, text='Quit', command=master.quit).grid(row=11, column=4)
 
 mainloop()
-
