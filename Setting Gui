@@ -2,8 +2,8 @@ from Tkinter import *
 
 master = Tk()
 
-master.title("Settings")
-File = open("Settings","w")
+master.title("config.txt")
+File = open("config.txt","w")
 
 port = Label(master, text="Enter Port:")
 port.grid(row=0, column=0)
