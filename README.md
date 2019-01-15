@@ -5,3 +5,5 @@ You will need to create a "SavedData" folder in the same directory as the arduni
 
 
 As a reference https://github.com/Marxlp/pyFlightAnalysis
+
+Need to creat a text file called Settings
