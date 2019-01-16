@@ -10,24 +10,36 @@ import datetime
 import numpy as np
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm
-from tkinter import *
-
-root = Tk()
-
-def task():
-    root = Tk()
-    w = Label(root, text="Warning Oil Pressure Above 90")
-    w.pack()
-    #root.after((float(parts[1])) > 90, task)  # reschedule event in 2 seconds
+from Tkinter import *
 
 print("Program Starting...")
 
-def error():
+root =Tk()
+
+def error(TempThresh):
     count = 0
     if (count == 0):
-        if (oil[-1] > 90 and ((oil[-2]) <= 90.0)):
-            root.after(((oil[-1]) > 90.0) and ((oil[-2]) <= 90.0),task)
-            count = count +1
+            #root.deiconify()
+            if (oil[-1] > TempThresh and (oil[-2]) <= TempThresh and error.has_been_called == True):
+                root.after(((oil[-1]) > TempThresh) and ((oil[-2]) <= TempThresh),task)
+                error.has_been_called = False
+                root.deiconify()
+                count = 0
+
+
+error.has_been_called = True
+
+def task():
+    #root =Tk()
+    root.title("Warning")
+    Label(root, text="Warning Above Threshold").grid(row=1, column=0)
+    Button(root, text='Quit', command=qandt).grid(row=2, column=0)
+
+def qandt():
+    
+    error.has_been_called = True
+    root.withdraw()
+
 
 #Parse config file
 def readConfigFile():
@@ -200,13 +212,13 @@ def update(i):
 oil = []
 
 #a tread to constantly read the serial data
-def Task1(ser,x,y,col):
+def Task1(ser,x,y,col,tempThresh):
 
         while 1:#while loop to allows read the serial input
             b = ser.readline().decode("utf-8")#readline(make sure that there is infact a \n char otherwise this won't end)
             parts = b.split(',')#splits by a ','
             oil.append(float(parts[1]))
-            error()
+            error(tempThresh)
             try:#trys to parse data(sometimes at the begining there isn't a full line
                 val = float(parts[1])
                 x.append(int(parts[0])/1000.0)#time
@@ -226,7 +238,7 @@ def Main():
     time.sleep(1)
     ser.flushInput()#Ensure the stored input is emptyed(will sometime contain infomation from last run)
     time.sleep(1)
-    t1 = threading.Thread(target = Task1, args=[ser,xData,yData,colour])#make the serial reading thread
+    t1 = threading.Thread(target = Task1, args=[ser,xData,yData,colour,int(firstDataSet[4])])#make the serial reading thread
     #print ("Starting Thread 1")
     t1.start()#start the serial reading tread
     an = ani.FuncAnimation(fig, update, interval=200)#sets up the animate function for the graph
